@@ -5,7 +5,10 @@ import NoteListNav from "../NoteListNav/NoteListNav";
 import NotePageNav from "../NotePageNav/NotePageNav";
 import NoteListMain from "../NoteListMain/NoteListMain";
 import NotePageMain from "../NotePageMain/NotePageMain";
+import AddFolder from "../AddFolder/AddFolder";
+import AddNote from "../AddNote/AddNote";
 import ApiContext from "../ApiContext";
+import AppError from "../AppError";
 import config from "../config";
 import "./App.css";
 
@@ -21,7 +24,8 @@ class App extends Component {
       fetch(`${config.API_ENDPOINT}/folders`),
     ])
       .then(([notesRes, foldersRes]) => {
-        if (!notesRes.ok) return notesRes.json().then((e) => Promise.reject(e));
+        if (!notesRes.ok)
+          return notesRes.json().then((e) => Promise.reject(e));
         if (!foldersRes.ok)
           return foldersRes.json().then((e) => Promise.reject(e));
 
@@ -41,9 +45,23 @@ class App extends Component {
     });
   };
 
-  handleAddNote = () => {
-    this.setState({});
+  handleAddNote = (note) => {
+    this.setState({
+      notes: [
+        ...this.state.notes,
+        note
+      ]
+    });
   };
+
+  handleAddFolder = (folder) => {
+    this.setState({
+      folders: [
+        ...this.state.folders,
+        folder
+      ]
+    })
+  }
 
   renderNavRoutes() {
     return (
@@ -65,6 +83,8 @@ class App extends Component {
           <Route exact key={path} path={path} component={NoteListMain} />
         ))}
         <Route path="/note/:noteId" component={NotePageMain} />
+        <Route path="/add-folder" component={AddFolder} />
+        <Route path="/add-note" component={AddNote} />
       </>
     );
   }
@@ -74,20 +94,24 @@ class App extends Component {
       notes: this.state.notes,
       folders: this.state.folders,
       deleteNote: this.handleDeleteNote,
+      addNote: this.handleAddNote,
+      addFolder: this.handleAddFolder
     };
     return (
-      <ApiContext.Provider value={value}>
-        <div className="App">
-          <nav className="App__nav">{this.renderNavRoutes()}</nav>
-          <header className="App__header">
-            <h1>
-              <Link to="/">Noteful</Link>{" "}
-              <FontAwesomeIcon icon="check-double" />
-            </h1>
-          </header>
-          <main className="App__main">{this.renderMainRoutes()}</main>
-        </div>
-      </ApiContext.Provider>
+      <AppError>
+        <ApiContext.Provider value={value}>
+          <div className="App">
+            <nav className="App__nav">{this.renderNavRoutes()}</nav>
+            <header className="App__header">
+              <h1>
+                <Link to="/">Noteful</Link>{" "}
+                <FontAwesomeIcon icon="check-double" />
+              </h1>
+            </header>
+            <main className="App__main">{this.renderMainRoutes()}</main>
+          </div>
+        </ApiContext.Provider>
+      </AppError>
     );
   }
 }
