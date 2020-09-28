@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ApiContext from "../ApiContext";
 import ValidationError from "../ValidationError";
+import config from "../config";
 
 import "./AddFolder.css";
 
@@ -15,12 +16,13 @@ export default class AddFolder extends Component {
   submitAddFolderForm = (event) => {
     event.preventDefault();
 
-    fetch("http://localhost:9090/folders", {
+    fetch("http://localhost:8000/api/folders", {
       method: "POST",
       headers: {
+        "Authorization": "Bearer " + config.API_KEY,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name: event.target["folderName"].value }),
+      body: JSON.stringify({ folder_name: event.target["folderName"].value }),
     })
       .then((response) => {
         if (!response.ok) {

@@ -19,9 +19,13 @@ class App extends Component {
   };
 
   componentDidMount() {
+    const params = {
+      headers: {'Authorization': 'Bearer ' + config.API_KEY, 'Content-Type': 'application/json'
+      }
+    }
     Promise.all([
-      fetch(`${config.API_ENDPOINT}/notes`),
-      fetch(`${config.API_ENDPOINT}/folders`),
+      fetch(`${config.API_ENDPOINT}/notes`, params),
+      fetch(`${config.API_ENDPOINT}/folders`, params),
     ])
       .then(([notesRes, foldersRes]) => {
         if (!notesRes.ok)
