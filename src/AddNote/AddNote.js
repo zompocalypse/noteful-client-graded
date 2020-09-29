@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ApiContext from "../ApiContext";
 import Select from "react-select";
 import ValidationError from "../ValidationError";
+import config from "../config";
 
 import "./AddNote.css";
 
@@ -15,7 +16,7 @@ export default class AddNote extends Component {
       value: "",
       touched: false,
     },
-    folder: {
+    folderId: {
       value: "",
       touched: false,
     },
@@ -26,15 +27,16 @@ export default class AddNote extends Component {
   submitAddNoteForm = (event) => {
     event.preventDefault();
     const note = {
-      name: event.target["noteName"].value,
+      note_name: event.target["noteName"].value,
       content: event.target["noteContent"].value,
-      folderId: event.target["noteFolder"].value,
+      folder_id: event.target["noteFolder"].value,
       modified: new Date(),
     };
 
-    fetch("http://localhost:9090/notes", {
+    fetch("http://localhost:8000/api/notes", {
       method: "POST",
       headers: {
+        "Authorization": "Bearer " + config.API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(note),
@@ -47,7 +49,7 @@ export default class AddNote extends Component {
       })
       .then((note) => {
         this.context.addNote(note);
-        this.props.history.push(`/folder/${note.folderId}`);
+        this.props.history.push(`/folder/${note.folder_id}`);
       })
       .catch((error) => {
         console.error("Error:", { error });
@@ -62,8 +64,8 @@ export default class AddNote extends Component {
     this.setState({ content: { value: content, touched: true } });
   }
 
-  updateNoteFolder(folder) {
-    this.setState({ folder: { value: folder, touched: true } });
+  updateNoteFolder(folderId) {
+    this.setState({ folderId: { value: folderId, touched: true } });
   }
 
   validateNoteName() {
@@ -81,7 +83,7 @@ export default class AddNote extends Component {
   }
 
   validateNoteFolder() {
-    const folder = this.state.folder.value;
+    const folder = this.state.folderId.value;
     if (folder.length === 0) {
       return "You must choose a folder";
     }
@@ -95,7 +97,7 @@ export default class AddNote extends Component {
     const options = this.context.folders.map((folder) => {
       let folderList = {};
       folderList["value"] = folder.id;
-      folderList["label"] = folder.name;
+      folderList["label"] = folder.folder_name;
       return folderList;
     });
     return (
@@ -133,7 +135,7 @@ export default class AddNote extends Component {
                 options={options}
                 onChange={(event) => this.updateNoteFolder(event.label)}
               />
-              {this.state.folder.touched && (
+              {this.state.folderId.touched && (
                 <ValidationError message={folderError} />
               )}
             </div>
@@ -146,7 +148,7 @@ export default class AddNote extends Component {
                 this.validateNoteFolder()
               }
             >
-              Add Folder
+              Add Note
             </button>
           </fieldset>
         </form>

@@ -20,6 +20,12 @@ export default class NoteListMain extends React.Component {
     const { folderId } = this.props.match.params
     const { notes=[] } = this.context
     const notesForFolder = getNotesForFolder(notes, folderId)
+    console.log(this.props.match.params)
+    console.log(this.context)
+    console.log(folderId)
+    console.log(notes)
+    console.log(getNotesForFolder(notes, folderId))
+    console.log(notesForFolder)
     return (
       <section className='NoteListMain'>
         <ul>
@@ -28,7 +34,7 @@ export default class NoteListMain extends React.Component {
               <NoteError>
                 <Note
                   id={note.id}
-                  name={note.name}
+                  name={note.note_name}
                   modified={note.modified}
                 />
               </NoteError>
